@@ -3,11 +3,13 @@ package com.example.amidezcod.databasedemo;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -194,8 +196,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 finish();
                 break;
             case R.id.action_delete:
-                deletePet();
-                finish();
+                showDeleteConfirmationDialog();
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -272,5 +273,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         }
 
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setMessage("Confirm Delete")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deletePet();
+                        finish();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
