@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements
         android.app.LoaderManager.LoaderCallbacks<Cursor>, PetAdapter.ListItemClickListener {
     private RecyclerView recyclerView;
     private PetAdapter petAdapter;
+    private FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +31,35 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         setupRecyclerView();
         floatingAction();
+        adapterSettingandLoaderInitilization();
+        scrollFlags();
+    }
+
+    private void scrollFlags() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        floatingActionButton.show();
+                        break;
+                    default:
+                        floatingActionButton.hide();
+                        break;
+                }
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+    }
+
+    private void adapterSettingandLoaderInitilization() {
         petAdapter = new PetAdapter(this, null, this);
         recyclerView.setAdapter(petAdapter);
         getLoaderManager().initLoader(1, null, this).forceLoad();
     }
 
     private void floatingAction() {
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab2);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab2);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
         Intent intent = new Intent(MainActivity.this, EditorActivity.class);
         intent.setData(ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex));
-        Log.v("TAG",ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex).toString());
+        Log.v("TAG", ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex).toString());
         startActivity(intent);
     }
 }

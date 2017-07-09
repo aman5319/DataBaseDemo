@@ -9,15 +9,19 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbarSize="2dp"
+        android:scrollbarStyle="insideInset"
+        android:scrollbarThumbVertical="@color/colorAccent"
+        android:scrollbars="vertical"
         tools:listitem="@layout/list_item" />
 
     <!-- Empty view for the list -->
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/empty_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/empty_shelter_image"
