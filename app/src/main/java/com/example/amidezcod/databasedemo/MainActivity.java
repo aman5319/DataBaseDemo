@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
         Intent intent = new Intent(MainActivity.this, EditorActivity.class);
         intent.setData(ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex));
+        Log.v("TAG",ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex).toString());
         startActivity(intent);
     }
 }

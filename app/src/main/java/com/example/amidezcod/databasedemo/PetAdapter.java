@@ -42,6 +42,7 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
         cursor.moveToPosition(position); // get to the right location in the cursor
         holder.name.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)));
         holder.summary.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)));
+        holder.number.setText(String.valueOf(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID))));
         setAnimation(holder.itemView, position);
     }
 
@@ -75,24 +76,23 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
         void onListItemClick(int clickedItemIndex);
     }
 
-    interface click {
-        void clickHandle(int clickIndex);
-    }
-
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         TextView summary;
+        TextView number;
 
         private MyViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             name = (TextView) itemView.findViewById(R.id.name);
             summary = (TextView) itemView.findViewById(R.id.summary);
+            number = (TextView) itemView.findViewById(R.id.numbering);
         }
 
         @Override
         public void onClick(View view) {
-        mOnClickListener.onListItemClick(getAdapterPosition());
+            cursor.moveToFirst();
+            mOnClickListener.onListItemClick(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID)));
         }
     }
 }
