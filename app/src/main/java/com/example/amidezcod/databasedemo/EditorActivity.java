@@ -9,6 +9,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -198,12 +199,35 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.action_delete:
                 showDeleteConfirmationDialog();
                 break;
+            case android.R.id.home:
+                if (mPetHasChanged)
+                    navigation();
+                else
+                    NavUtils.navigateUpFromSameTask(this);
             default:
                 super.onOptionsItemSelected(item);
                 break;
 
         }
         return true;
+    }
+
+    private void navigation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setMessage("Discard Your changes and quit editing?")
+                .setPositiveButton("Discard", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).setNegativeButton("Keep Editing", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void savePet() {
@@ -292,5 +316,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mPetHasChanged)
+            navigation();
+        else {
+            super.onBackPressed();
+        }
+
     }
 }
