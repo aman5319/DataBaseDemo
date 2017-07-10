@@ -38,6 +38,7 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         cursor.moveToPosition(position); // get to the right location in the cursor
+        holder.itemView.setTag(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID)));
         holder.name.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)));
         holder.summary.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)));
         setAnimation(holder.itemView, position);

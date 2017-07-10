@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,25 @@ public class MainActivity extends AppCompatActivity implements
         floatingAction();
         adapterSettingAndLoaderInitilization();
         scrollFlags();
+        itemDecorate();
+    }
+
+    private void itemDecorate() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int id = (Integer) viewHolder.itemView.getTag();
+                int rowsDeleted = getContentResolver().delete(ContentUris.withAppendedId(PetEntry.CONTENT_URI, id)
+                        , null
+                        , null);
+                petAdapter.notifyItemRemoved(rowsDeleted);
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 
     private void scrollFlags() {
