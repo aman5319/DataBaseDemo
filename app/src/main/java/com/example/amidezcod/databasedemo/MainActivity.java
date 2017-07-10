@@ -6,9 +6,19 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -35,10 +45,19 @@ public class MainActivity extends AppCompatActivity implements
         adapterSettingAndLoaderInitilization();
         scrollFlags();
         itemDecorate();
+        itemSwipeAnimation();
+    }
+
+    private void itemSwipeAnimation() {
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setAddDuration(500);
+        itemAnimator.setRemoveDuration(600);
+        recyclerView.setItemAnimator(itemAnimator);
     }
 
     private void itemDecorate() {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -51,6 +70,49 @@ public class MainActivity extends AppCompatActivity implements
                         , null
                         , null);
                 petAdapter.notifyItemRemoved(rowsDeleted);
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                Bitmap icon;
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View view = viewHolder.itemView;
+                    float height = view.getHeight();
+                    float width = height / 3;
+                    Paint paint = new Paint();
+                    paint.setColor(Color.parseColor("#388E3C"));
+                    RectF rectF = new RectF(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                    c.drawRect(rectF, paint);
+                    icon = getBitmapFromVector(R.drawable.ic_delete_black_24dp);
+                    RectF icon_dest;
+                    if (dX > 0) {
+
+                        icon_dest = new RectF(view.getLeft() + width, view.getTop() + width, view.getLeft() + 2 * width
+                                , view.getBottom() - width);
+                    } else {
+                        icon_dest = new RectF(view.getRight() - 2 * width, view.getTop() + width,
+                                view.getRight() - width, view.getBottom() - width);
+
+                    }
+                    c.drawBitmap(icon, null, icon_dest, paint);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            private Bitmap getBitmapFromVector(int ic_delete_black_24dp) {
+                Drawable drawable = ContextCompat.getDrawable(MainActivity.this, ic_delete_black_24dp);
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                    drawable = (DrawableCompat.wrap(drawable)).mutate();
+
+                }
+
+                Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+                        Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                drawable.draw(canvas);
+                return bitmap;
             }
         }).attachToRecyclerView(recyclerView);
     }
