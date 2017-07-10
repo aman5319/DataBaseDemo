@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 public final class PetContract {
     public static final String CONTENT_AUTHORITY = "com.example.amidezcod.databasedemo";
     public static final String PATH = "pets";
-    public static final Uri BAS_CONTENT = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final Uri BAS_CONTENT = Uri.parse("content://" + CONTENT_AUTHORITY);
     private PetContract() {
 
     }

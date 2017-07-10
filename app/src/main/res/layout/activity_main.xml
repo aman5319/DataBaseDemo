@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:contentDescription="@string/no_pets_stored"
             android:src="@drawable/ic_empty_shelter" />
 
         <TextView
@@ -42,7 +43,6 @@
             android:textAppearance="?android:textAppearanceMedium" />
 
         <TextView
-            android:id="@+id/empty_subtitle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_title_text"
@@ -65,6 +65,7 @@
         android:elevation="18dp"
         android:src="@drawable/ic_add_pet"
         app:fabSize="auto"
-        app:rippleColor="@color/colorPrimary" />
+        app:rippleColor="@color/colorPrimary"
+        tools:targetApi="lollipop_mr1" />
 </RelativeLayout>
 

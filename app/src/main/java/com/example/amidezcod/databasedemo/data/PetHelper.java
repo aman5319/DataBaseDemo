@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by amidezcod on 9/7/17.
  */
 
-public class PetHelper extends SQLiteOpenHelper {
+class PetHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "pets_home.db";
     private static final int DATABASE_VERSION = 1;
 

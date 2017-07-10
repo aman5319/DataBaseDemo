@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         setupRecyclerView();
         floatingAction();
-        adapterSettingandLoaderInitilization();
+        adapterSettingAndLoaderInitilization();
         scrollFlags();
     }
 
@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void adapterSettingandLoaderInitilization() {
-        petAdapter = new PetAdapter(this, null, this);
+    private void adapterSettingAndLoaderInitilization() {
+        petAdapter = new PetAdapter(this, this);
         recyclerView.setAdapter(petAdapter);
         getLoaderManager().initLoader(1, null, this).forceLoad();
     }
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements
         getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
-    public void checkEmptyView() {
+    private void checkEmptyView() {
         View EmptyView = findViewById(R.id.empty_view);
         if (petAdapter.getItemCount() == 0) {
             EmptyView.setVisibility(View.VISIBLE);

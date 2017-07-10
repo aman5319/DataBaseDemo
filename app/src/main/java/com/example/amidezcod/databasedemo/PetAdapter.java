@@ -19,16 +19,14 @@ import com.example.amidezcod.databasedemo.data.PetContract;
 public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
 
     final private ListItemClickListener mOnClickListener;
-    int viewHolderCount;
     private Context context;
     private Cursor cursor;
     private int lastPosition = -1;
 
-    public PetAdapter(Context context, Cursor cursor, ListItemClickListener mOnClickListener) {
+    public PetAdapter(Context context, ListItemClickListener mOnClickListener) {
         this.context = context;
-        this.cursor = cursor;
+        this.cursor = null;
         this.mOnClickListener = mOnClickListener;
-        viewHolderCount = 0;
     }
 
     @Override
@@ -42,7 +40,6 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
         cursor.moveToPosition(position); // get to the right location in the cursor
         holder.name.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)));
         holder.summary.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)));
-        holder.number.setText(String.valueOf(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID))));
         setAnimation(holder.itemView, position);
     }
 
@@ -55,6 +52,11 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
     }
 
     @Override
+    public void onViewDetachedFromWindow(MyViewHolder holder) {
+        holder.itemView.clearAnimation();
+    }
+
+    @Override
     public int getItemCount() {
         if (cursor == null) {
             return 0;
@@ -62,17 +64,15 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
         return cursor.getCount();
     }
 
-    public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor != null) {
-            this.cursor = newCursor;
-            this.notifyDataSetChanged();
-            return cursor;
-        } else {
-            return null;
-        }
+    public void swapCursor(Cursor newCursor) {
+        if (newCursor == null)
+            return;
+
+        this.cursor = newCursor;
+        this.notifyDataSetChanged();
     }
 
-    public interface ListItemClickListener {
+    interface ListItemClickListener {
         void onListItemClick(int clickedItemIndex);
     }
 
@@ -86,12 +86,11 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
             itemView.setOnClickListener(this);
             name = (TextView) itemView.findViewById(R.id.name);
             summary = (TextView) itemView.findViewById(R.id.summary);
-            number = (TextView) itemView.findViewById(R.id.numbering);
         }
 
         @Override
         public void onClick(View view) {
-            cursor.moveToFirst();
+            cursor.moveToPosition(getAdapterPosition());
             mOnClickListener.onListItemClick(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID)));
         }
     }

@@ -55,7 +55,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private boolean mPetHasChanged = false;
     private Spinner mGenderSpinner;
-    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+    private final View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             mPetHasChanged = true;
@@ -106,12 +106,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
-                    if (selection.equals("Male")) {
-                        mGender = PetContract.PetEntry.GENDER_MALE;
-                    } else if (selection.equals("Female")) {
-                        mGender = PetContract.PetEntry.GENDER_FEMALE;
-                    } else {
-                        mGender = PetContract.PetEntry.GENDER_UNKNOWN;
+                    switch (selection) {
+                        case "Male":
+                            mGender = PetContract.PetEntry.GENDER_MALE;
+                            break;
+                        case "Female":
+                            mGender = PetContract.PetEntry.GENDER_FEMALE;
+                            break;
+                        default:
+                            mGender = PetContract.PetEntry.GENDER_UNKNOWN;
+                            break;
                     }
                 }
             }

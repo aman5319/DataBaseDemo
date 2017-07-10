@@ -29,7 +29,7 @@ public class PetProvider extends ContentProvider {
         uriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH + "/#", TASK_ID);
     }
 
-    PetHelper petHelper;
+    private PetHelper petHelper;
 
     @Override
     public boolean onCreate() {
@@ -181,20 +181,21 @@ public class PetProvider extends ContentProvider {
 
         // No need to check the breed, any value is valid (including null).
 
-        // Get writeable database
+        // Get writable database
         SQLiteDatabase database = petHelper.getWritableDatabase();
         long id = database.insert(PetEntry.TABLE_NAME, null, values);
         if (id == -1) {
-            Log.v("AMAN", "wrong id");
+            Log.v("TAG", "wrong id");
             return null;
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (getContext() != null)
+            getContext().getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String selection,
+    public int update(@NonNull Uri uri, ContentValues contentValues, String selection,
                       String[] selectionArgs) {
         final int match = uriMatcher.match(uri);
         switch (match) {
@@ -262,7 +263,8 @@ public class PetProvider extends ContentProvider {
         // If 1 or more rows were updated, then notify all listeners that the data at the
         // given URI has changed
         if (rowsUpdated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            if (getContext() != null)
+                getContext().getContentResolver().notifyChange(uri, null);
         }
 
         // Return the number of rows updated
@@ -271,7 +273,7 @@ public class PetProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        // Get writeable database
+        // Get writable database
         SQLiteDatabase database = petHelper.getWritableDatabase();
 
         // Track the number of rows that were deleted
@@ -296,7 +298,8 @@ public class PetProvider extends ContentProvider {
         // If 1 or more rows were deleted, then notify all listeners that the data at the
         // given URI has changed
         if (rowsDeleted != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            if (getContext() != null)
+                getContext().getContentResolver().notifyChange(uri, null);
         }
 
         // Return the number of rows deleted
