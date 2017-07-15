@@ -179,8 +179,6 @@ public class PetProvider extends ContentProvider {
             throw new IllegalArgumentException("Pet requires valid weight");
         }
 
-        // No need to check the breed, any value is valid (including null).
-
         // Get writable database
         SQLiteDatabase database = petHelper.getWritableDatabase();
         long id = database.insert(PetEntry.TABLE_NAME, null, values);

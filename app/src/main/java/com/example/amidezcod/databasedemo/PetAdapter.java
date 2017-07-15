@@ -80,7 +80,6 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         TextView summary;
-        TextView number;
 
         private MyViewHolder(View itemView) {
             super(itemView);

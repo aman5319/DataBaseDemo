@@ -26,6 +26,7 @@ class PetHelper extends SQLiteOpenHelper {
                 + PetContract.PetEntry.COLUMN_PET_NAME + " TEXT NOT NULL, "
                 + PetContract.PetEntry.COLUMN_PET_BREED + " TEXT, "
                 + PetContract.PetEntry.COLUMN_PET_GENDER + " INTEGER NOT NULL, "
+                + PetContract.PetEntry.COLUMN_PET_IMAGE + " BLOB, "
                 + PetContract.PetEntry.COLUMN_PET_WEIGHT + " INTEGER NOT NULL DEFAULT 0);";
 
         sqLiteDatabase.execSQL(CREATE_PETS_TABLE);
@@ -33,7 +34,7 @@ class PetHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE " + PetContract.PetEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + PetContract.PetEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
 
     }

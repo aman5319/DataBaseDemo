@@ -1,15 +1,22 @@
 package com.example.amidezcod.databasedemo;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -20,15 +27,20 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.amidezcod.databasedemo.data.PetContract;
+import com.example.amidezcod.databasedemo.utility.BitmapUtility;
 
 import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int EXISTING_PET_LOADER = 0;
+    private static final int REQUEST_CODE_FOR_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 1551;
+
 
     /**
      * Content URI for the existing pet (null if it's a new pet)
@@ -53,8 +65,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * EditText field to enter the pet's gender
      */
+    private ImageView mDogsImage;
     private boolean mPetHasChanged = false;
-    private Spinner mGenderSpinner;
     private final View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -62,7 +74,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return false;
         }
     };
+    private Spinner mGenderSpinner;
     private int mGender = PetContract.PetEntry.GENDER_UNKNOWN;
+    private Bitmap imageBitmap;
 
     /**
      * Boolean flag that keeps track of whether the pet has been edited (true) or not (false)
@@ -75,7 +89,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
-
+        mDogsImage = (ImageView) findViewById(R.id.dog_image);
+        mDogsImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraPermission(v);
+            }
+        });
 
         mNameEditText.setOnTouchListener(onTouchListener);
         mBreedEditText.setOnTouchListener(onTouchListener);
@@ -91,6 +111,48 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             getLoaderManager().initLoader(EXISTING_PET_LOADER, null, this).forceLoad();
         }
         setupSpinner();
+    }
+
+    private void cameraPermission(View v) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_FOR_EXTERNAL_STORAGE);
+        } else {
+            launchCamera();
+        }
+    }
+
+    private void launchCamera() {
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            imageBitmap = (Bitmap) extras.get("data");
+            mDogsImage.setImageBitmap(imageBitmap);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_FOR_EXTERNAL_STORAGE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    launchCamera();
+                } else {
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
     private void setupSpinner() {
@@ -130,12 +192,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = {
+        String[] projection;
+
+        projection = new String[]{
                 PetContract.PetEntry._ID,
                 PetContract.PetEntry.COLUMN_PET_NAME,
                 PetContract.PetEntry.COLUMN_PET_BREED,
                 PetContract.PetEntry.COLUMN_PET_GENDER,
+                PetContract.PetEntry.COLUMN_PET_IMAGE,
                 PetContract.PetEntry.COLUMN_PET_WEIGHT};
+
 
         return new CursorLoader(this
                 , mCurrentPetUri
@@ -145,12 +211,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 , null);
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data == null || data.getCount() < 1) {
             return;
         }
         if (data.moveToFirst()) {
+            if (data.getBlob(data.getColumnIndex(PetContract.PetEntry.COLUMN_PET_IMAGE)) == null) {
+                mDogsImage.setImageResource(R.drawable.dog_default_profile);
+            } else {
+                byte[] imageArray = data.getBlob(data.getColumnIndex(PetContract.PetEntry.COLUMN_PET_IMAGE));
+                mDogsImage.setImageBitmap(BitmapUtility.getImage(imageArray));
+            }
+
             mNameEditText.setText(data.getString(data.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)));
             mBreedEditText.setText(data.getString(data.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)));
             mWeightEditText.setText(String.valueOf(data.getString(data.getColumnIndex(PetContract.PetEntry.COLUMN_PET_WEIGHT))));
@@ -239,7 +313,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         String weightString = mWeightEditText.getText().toString().trim();
-
+        ContentValues values = new ContentValues();
+        if (imageBitmap != null) {
+            values.put(PetContract.PetEntry.COLUMN_PET_IMAGE, BitmapUtility.getBytes(imageBitmap));
+        }
         if (mCurrentPetUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(breedString) &&
                 TextUtils.isEmpty(weightString) && mGender == PetContract.PetEntry.GENDER_UNKNOWN) {
@@ -247,7 +324,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
 
-        ContentValues values = new ContentValues();
         values.put(PetContract.PetEntry.COLUMN_PET_NAME, nameString);
         values.put(PetContract.PetEntry.COLUMN_PET_BREED, breedString);
         values.put(PetContract.PetEntry.COLUMN_PET_GENDER, mGender);
@@ -262,9 +338,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
             Uri newUri = getContentResolver().insert(PetContract.PetEntry.CONTENT_URI, values);
 
-
             if (newUri == null) {
-
                 Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
@@ -286,6 +360,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         }
     }
+
 
     private void deletePet() {
 
