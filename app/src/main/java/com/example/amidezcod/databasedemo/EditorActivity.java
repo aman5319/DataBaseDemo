@@ -10,6 +10,7 @@ import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -40,6 +42,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private static final int EXISTING_PET_LOADER = 0;
     private static final int REQUEST_CODE_FOR_EXTERNAL_STORAGE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 1551;
+    private static final int REQUEST_CODE_FOR_IMAGE_PICKER = 454;
 
 
     /**
@@ -77,12 +80,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Spinner mGenderSpinner;
     private int mGender = PetContract.PetEntry.GENDER_UNKNOWN;
     private Bitmap imageBitmap;
+    private PopupMenu popupMenu;
 
     /**
      * Boolean flag that keeps track of whether the pet has been edited (true) or not (false)
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
@@ -90,10 +94,29 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
         mDogsImage = (ImageView) findViewById(R.id.dog_image);
+
         mDogsImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraPermission(v);
+                popupMenu = new PopupMenu(EditorActivity.this, v);
+                popupMenu.getMenuInflater().inflate(R.menu.image_select, popupMenu.getMenu());
+                popupMenu.show();
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.take_photo:
+                                cameraPermission();
+                                return true;
+                            case R.id.choose_photo:
+                                photoChoserFromGallery();
+                                return true;
+                            default:
+                                throw new IllegalArgumentException("Wrong selection");
+                        }
+                    }
+                });
+
             }
         });
 
@@ -113,7 +136,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         setupSpinner();
     }
 
-    private void cameraPermission(View v) {
+    private void cameraPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -122,6 +145,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         } else {
             launchCamera();
         }
+    }
+
+    private void photoChoserFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        intent.putExtra("crop", "true");
+        intent.putExtra("scale", true);
+        intent.putExtra("outputX", 256);
+        intent.putExtra("outputY", 256);
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("return-data", true);
+
+        startActivityForResult(intent, REQUEST_CODE_FOR_IMAGE_PICKER);
     }
 
     private void launchCamera() {
@@ -139,6 +176,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             imageBitmap = (Bitmap) extras.get("data");
             mDogsImage.setImageBitmap(imageBitmap);
         }
+        if (requestCode == REQUEST_CODE_FOR_IMAGE_PICKER && resultCode == RESULT_OK) {
+            mDogsImage.setImageURI(data.getData());
+            BitmapDrawable drawable = (BitmapDrawable) mDogsImage.getDrawable();
+            imageBitmap = drawable.getBitmap();
+        }
+
     }
 
     @Override
