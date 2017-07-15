@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -144,6 +145,33 @@ public class PetProvider extends ContentProvider {
                 return ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + PetContract.CONTENT_AUTHORITY + "/" + PetContract.PATH;
             default:
                 throw new IllegalArgumentException("wrong mime");
+        }
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        switch (uriMatcher.match(uri)) {
+            case TASK:
+                SQLiteDatabase database = petHelper.getWritableDatabase();
+                int noOfRowsAffected = 0;
+                try {
+                    database.beginTransaction();
+                    for (ContentValues contentValues : values) {
+                        database.insert(PetEntry.TABLE_NAME, null, contentValues);
+                        noOfRowsAffected++;
+                    }
+                    database.setTransactionSuccessful();
+                } catch (SQLException e) {
+                    Log.v("TAG", e.getMessage());
+                } finally {
+                    database.endTransaction();
+                }
+
+                if (getContext()!=null)
+                    getContext().getContentResolver().notifyChange(uri,null);
+                return noOfRowsAffected;
+            default:
+                throw new IllegalArgumentException("error with bulk insert");
         }
     }
 

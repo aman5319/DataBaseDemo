@@ -1,7 +1,6 @@
 package com.example.amidezcod.databasedemo;
 
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -22,13 +21,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.amidezcod.databasedemo.data.PetContract;
 import com.example.amidezcod.databasedemo.data.PetContract.PetEntry;
+import com.example.amidezcod.databasedemo.utility.TestUtil;
 
 public class MainActivity extends AppCompatActivity implements
         android.app.LoaderManager.LoaderCallbacks<Cursor>, PetAdapter.ListItemClickListener {
@@ -205,8 +204,12 @@ public class MainActivity extends AppCompatActivity implements
                 deleteAll();
                 checkEmptyView();
                 return true;
-            case R.id.insert_dummy:
-                insertPet();
+            case R.id.insert_bulk_dummy:
+                TestUtil.insertBulkFakeData(this);
+                checkEmptyView();
+                return true;
+            case R.id.insert_single_dummy:
+                TestUtil.insertSingleDummyData(this);
                 checkEmptyView();
                 return true;
             default:
@@ -216,19 +219,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void deleteAll() {
         getContentResolver().delete(PetContract.PetEntry.CONTENT_URI, null, null);
-    }
-
-    //dummy data
-    private void insertPet() {
-        // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
-        ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, "Toto");
-        values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
-        values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
-
-        getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
     private void checkEmptyView() {
@@ -244,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
         Intent intent = new Intent(MainActivity.this, EditorActivity.class);
         intent.setData(ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex));
-        Log.v("TAG", ContentUris.withAppendedId(PetEntry.CONTENT_URI, clickedItemIndex).toString());
         startActivity(intent);
     }
 }
