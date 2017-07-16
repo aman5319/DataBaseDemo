@@ -60,4 +60,5 @@
     <string name="choose_photo">Choose Photo</string>
     <string name="insert_single">Insert Single</string>
     <string name="insert_in_bulk">Insert in Bulk</string>
+    <string name="image_of_the_pet">Image of the pet</string>
 </resources>

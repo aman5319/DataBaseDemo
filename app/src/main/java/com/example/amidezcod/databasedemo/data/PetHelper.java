@@ -3,7 +3,6 @@ package com.example.amidezcod.databasedemo.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Created by amidezcod on 9/7/17.
@@ -20,7 +19,6 @@ class PetHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        Log.v("AMAN", "create");
         String CREATE_PETS_TABLE = "CREATE TABLE " + PetContract.PetEntry.TABLE_NAME + " ( "
                 + PetContract.PetEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + PetContract.PetEntry.COLUMN_PET_NAME + " TEXT NOT NULL, "
@@ -34,7 +32,7 @@ class PetHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + PetContract.PetEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE " + PetContract.PetEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
 
     }

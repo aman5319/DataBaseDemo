@@ -8,9 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amidezcod.databasedemo.data.PetContract;
+import com.example.amidezcod.databasedemo.utility.BitmapUtility;
 
 /**
  * Created by amidezcod on 9/7/17.
@@ -20,12 +22,11 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
 
     final private ListItemClickListener mOnClickListener;
     private Context context;
-    private Cursor cursor;
+    private Cursor cursor = null;
     private int lastPosition = -1;
 
     public PetAdapter(Context context, ListItemClickListener mOnClickListener) {
         this.context = context;
-        this.cursor = null;
         this.mOnClickListener = mOnClickListener;
     }
 
@@ -41,6 +42,12 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
         holder.itemView.setTag(cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry._ID)));
         holder.name.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME)));
         holder.summary.setText(cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED)));
+        if (cursor.getBlob(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_IMAGE)) == null) {
+            holder.imageView.setImageResource(R.drawable.dog_default_profile);
+        } else {
+            byte[] imageArray = cursor.getBlob(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_IMAGE));
+            holder.imageView.setImageBitmap(BitmapUtility.getImage(imageArray));
+        }
         setAnimation(holder.itemView, position);
     }
 
@@ -80,12 +87,14 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.MyViewHolder> {
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         TextView summary;
+        ImageView imageView;
 
         private MyViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             name = (TextView) itemView.findViewById(R.id.name);
             summary = (TextView) itemView.findViewById(R.id.summary);
+            imageView = (ImageView) itemView.findViewById(R.id.image_petttt);
         }
 
         @Override

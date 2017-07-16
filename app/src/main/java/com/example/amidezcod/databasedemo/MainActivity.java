@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         setupRecyclerView();
         floatingAction();
-        adapterSettingAndLoaderInitilization();
+        adapterSettingAndLoaderInitialization();
         scrollFlags();
         itemDecorate();
         itemSwipeAnimation();
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void adapterSettingAndLoaderInitilization() {
+    private void adapterSettingAndLoaderInitialization() {
         petAdapter = new PetAdapter(this, this);
         recyclerView.setAdapter(petAdapter);
         getLoaderManager().initLoader(1, null, this).forceLoad();
@@ -163,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements
         String[] projection = new String[]{
                 PetContract.PetEntry._ID,
                 PetContract.PetEntry.COLUMN_PET_NAME,
-                PetContract.PetEntry.COLUMN_PET_BREED
+                PetContract.PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_IMAGE
         };
         return new CursorLoader(this,
                 PetContract.PetEntry.CONTENT_URI,
