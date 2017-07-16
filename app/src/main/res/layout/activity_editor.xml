@@ -1,24 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Layout for the editor -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditorActivity">
 
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="300dp"
+        android:fitsSystemWindows="true">
 
-        <ImageView
-            android:id="@+id/dog_image"
+        <FrameLayout
+            android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop"
-            android:src="@drawable/dog_default_profile" />
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:titleEnabled="false">
 
-        <!-- Overview category -->
+            <ImageView
+                android:id="@+id/dog_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/dog_default_profile" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginBottom="50dp"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:titleTextColor="@color/toolbar_title_color" />
+
+        </FrameLayout>
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,18 +75,23 @@
                     android:paddingStart="4dp">
 
                     <!-- Name field -->
-                    <EditText
-                        android:id="@+id/edit_pet_name"
-                        style="@style/EditorFieldStyle"
-                        android:hint="@string/hint_pet_name"
-                        android:inputType="textCapWords" />
+                    <android.support.design.widget.TextInputLayout style="@style/EditorFieldStyle">
 
+                        <EditText
+                            android:id="@+id/edit_pet_name"
+                            style="@style/EditorFieldStyle"
+                            android:hint="@string/hint_pet_name"
+                            android:inputType="textCapWords" />
+                    </android.support.design.widget.TextInputLayout>
                     <!-- Breed field -->
-                    <EditText
-                        android:id="@+id/edit_pet_breed"
-                        style="@style/EditorFieldStyle"
-                        android:hint="@string/hint_pet_breed"
-                        android:inputType="textCapWords" />
+                    <android.support.design.widget.TextInputLayout style="@style/EditorFieldStyle">
+
+                        <EditText
+                            android:id="@+id/edit_pet_breed"
+                            style="@style/EditorFieldStyle"
+                            android:hint="@string/hint_pet_breed"
+                            android:inputType="textCapWords" />
+                    </android.support.design.widget.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -108,13 +143,14 @@
                     android:paddingEnd="4dp"
                     android:paddingStart="4dp">
 
-                    <!-- Weight field -->
-                    <EditText
-                        android:id="@+id/edit_pet_weight"
-                        style="@style/EditorFieldStyle"
-                        android:hint="@string/hint_pet_weight"
-                        android:inputType="number" />
-
+                    <android.support.design.widget.TextInputLayout style="@style/EditorFieldStyle">
+                        <!-- Weight field -->
+                        <EditText
+                            android:id="@+id/edit_pet_weight"
+                            style="@style/EditorFieldStyle"
+                            android:hint="@string/hint_pet_weight"
+                            android:inputType="number" />
+                    </android.support.design.widget.TextInputLayout>
                     <!-- Units for weight (kg) -->
                     <TextView
                         style="@style/EditorUnitsStyle"
@@ -122,5 +158,7 @@
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>

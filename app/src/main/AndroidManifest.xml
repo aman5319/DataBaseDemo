@@ -25,6 +25,7 @@
             android:exported="false" />
 
         <activity
+            android:windowSoftInputMode="stateAlwaysHidden"
             android:name=".EditorActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/EditorTheme" />

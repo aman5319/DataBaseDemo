@@ -20,6 +20,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -95,30 +96,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
         mDogsImage = (ImageView) findViewById(R.id.dog_image);
 
-        mDogsImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupMenu = new PopupMenu(EditorActivity.this, v);
-                popupMenu.getMenuInflater().inflate(R.menu.image_select, popupMenu.getMenu());
-                popupMenu.show();
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.take_photo:
-                                cameraPermission();
-                                return true;
-                            case R.id.choose_photo:
-                                photoChoserFromGallery();
-                                return true;
-                            default:
-                                throw new IllegalArgumentException("Wrong selection");
-                        }
-                    }
-                });
-
-            }
-        });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        popMenuOnDogImageClickListner();
 
         mNameEditText.setOnTouchListener(onTouchListener);
         mBreedEditText.setOnTouchListener(onTouchListener);
@@ -146,6 +128,34 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             launchCamera();
         }
     }
+
+    private void popMenuOnDogImageClickListner() {
+        mDogsImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupMenu = new PopupMenu(EditorActivity.this, v);
+                popupMenu.getMenuInflater().inflate(R.menu.image_select, popupMenu.getMenu());
+                popupMenu.show();
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.take_photo:
+                                cameraPermission();
+                                return true;
+                            case R.id.choose_photo:
+                                photoChoserFromGallery();
+                                return true;
+                            default:
+                                throw new IllegalArgumentException("Wrong selection");
+                        }
+                    }
+                });
+
+            }
+        });
+    }
+
 
     private void photoChoserFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
